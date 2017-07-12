@@ -1,4 +1,4 @@
-
+grails.plugin.springsecurity.auth.loginFormUrl = '/openid_connect_login'
 
 // Added by the Spring Security Core plugin:
 grails.plugin.springsecurity.userLookup.userDomainClassName = 'helloauth.auth.User'
