@@ -6,12 +6,16 @@
 
 ## Building and running
 
-Grails is Gradle based. If you have gradle installed, you can use your version, or the built-in gradle wrapper.
+Grails comes with it's own wrapper. Many of the grails commands can also be accomplished with gradle (a wrapper for this is also included).
 
 **Build and start the app**
 
-    $ ./gradlew bootrun
+    $ ./grailsw run-app
 
 **Useful commands**
 
-    $ ./gradlew clean #dump app build files
+    $ ./grailsw clean #dump build files
+
+## Using it
+
+Once the app is running [helloAuth](http://localhost:8080), you can navigate to the helloWorldController. At the login prompt, the username/pass is admin/password. On success, you should see the hello world page.
