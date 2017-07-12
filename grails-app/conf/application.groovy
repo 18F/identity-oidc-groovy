@@ -4,6 +4,9 @@ grails.plugin.springsecurity.auth.loginFormUrl = '/openid_connect_login'
 grails.plugin.springsecurity.userLookup.userDomainClassName = 'helloauth.auth.User'
 grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'helloauth.auth.UserRole'
 grails.plugin.springsecurity.authority.className = 'helloauth.auth.Role'
+grails.plugin.springsecurity.providerNames = [
+	'openIdConnectAuthenticationProvider'
+]
 grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 	[pattern: '/',               access: ['permitAll']],
 	[pattern: '/error',          access: ['permitAll']],

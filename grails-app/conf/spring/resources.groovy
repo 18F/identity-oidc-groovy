@@ -1,6 +1,9 @@
 import org.mitre.oauth2.model.RegisteredClient
 import org.mitre.oauth2.model.ClientDetailsEntity.AuthMethod
+import org.mitre.openid.connect.client.NamedAdminAuthoritiesMapper
 import org.mitre.openid.connect.client.OIDCAuthenticationFilter
+import org.mitre.openid.connect.client.OIDCAuthenticationProvider
+import org.mitre.openid.connect.client.SubjectIssuerGrantedAuthority
 import org.mitre.openid.connect.client.service.ClientConfigurationService
 import org.mitre.openid.connect.client.service.impl.DynamicRegistrationClientConfigurationService
 import org.mitre.openid.connect.client.service.impl.DynamicServerConfigurationService
@@ -14,6 +17,7 @@ import helloauth.auth.UserPasswordEncoderListener
 beans = {
     userPasswordEncoderListener(UserPasswordEncoderListener, ref('hibernateDatastore'))
 	openIdConnectAuthenticationFilter(OIDCAuthenticationFilter) {
+		authenticationManager = ref('authenticationManager')
 		issuerService = staticIssuerService(StaticSingleIssuerService) {
 			issuer = 'https://mitreid.org/'
 		}
@@ -25,11 +29,15 @@ beans = {
 				tokenEndpointAuthMethod = AuthMethod.SECRET_BASIC
 				redirectUris = ['http://localhost:8080/openid_connect_login']
 			}
-			registeredClientService = registeredClientService(JsonFileRegisteredClientService) {
-				filename = '/tmp/grails-test-clients.json'
-			}
 		}
 		authRequestOptionsService = staticAuthRequestOptionsService(StaticAuthRequestOptionsService)
 		authRequestUrlBuilder = plainAuthRequestUrlBuilder(PlainAuthRequestUrlBuilder)
+	}
+	openIdConnectAuthenticationProvider(OIDCAuthenticationProvider) {
+		authoritiesMapper = namedAuthoritiesMapper(NamedAdminAuthoritiesMapper) {
+			admins = [
+				admin(SubjectIssuerGrantedAuthority, '90342.ASDFJWFA', 'https://mitreid.org/')
+			]
+		}
 	}
 }
