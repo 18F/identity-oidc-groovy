@@ -13,7 +13,6 @@ import helloauth.auth.UserPasswordEncoderListener
 // Place your Spring DSL code here
 beans = {
     userPasswordEncoderListener(UserPasswordEncoderListener, ref('hibernateDatastore'))
-	/*
 	openIdConnectAuthenticationFilter(OIDCAuthenticationFilter) {
 		issuerService = staticIssuerService(StaticSingleIssuerService) {
 			issuer = 'https://mitreid.org/'
@@ -33,5 +32,4 @@ beans = {
 		authRequestOptionsService = staticAuthRequestOptionsService(StaticAuthRequestOptionsService)
 		authRequestUrlBuilder = plainAuthRequestUrlBuilder(PlainAuthRequestUrlBuilder)
 	}
-	*/
 }
