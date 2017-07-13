@@ -2,7 +2,7 @@ package helloauth
 
 import grails.plugin.springsecurity.annotation.Secured
 
-@Secured('ROLE_ADMIN')
+@Secured('ROLE_USER')
 class HelloWorldController {
     def index() {
         render "<h1>Hello world!</h1>"
