@@ -16,28 +16,41 @@ import helloauth.auth.UserPasswordEncoderListener
 // Place your Spring DSL code here
 beans = {
     userPasswordEncoderListener(UserPasswordEncoderListener, ref('hibernateDatastore'))
+	
 	openIdConnectAuthenticationFilter(OIDCAuthenticationFilter) {
 		authenticationManager = ref('authenticationManager')
-		issuerService = staticIssuerService(StaticSingleIssuerService) {
-			issuer = 'https://mitreid.org/'
-		}
-		serverConfigurationService = dynamicServerConfigurationService(DynamicServerConfigurationService)
-		clientConfigurationService = dynamicClientConfigurationService(DynamicRegistrationClientConfigurationService) {
-			template = clientRegistrationTemplate(RegisteredClient) {
-				clientName = 'Grails Integration Test'
-				scope = ['openid', 'email', 'address', 'profile', 'phone']
-				tokenEndpointAuthMethod = AuthMethod.SECRET_BASIC
-				redirectUris = ['http://localhost:8080/openid_connect_login']
-			}
-		}
-		authRequestOptionsService = staticAuthRequestOptionsService(StaticAuthRequestOptionsService)
-		authRequestUrlBuilder = plainAuthRequestUrlBuilder(PlainAuthRequestUrlBuilder)
+		issuerService = ref('staticIssuerService')
+		serverConfigurationService = ref('dynamicServerConfigurationService')
+		clientConfigurationService = ref('dynamicClientConfigurationService')
+		authRequestOptionsService = ref('staticAuthRequestOptionsService')
+		authRequestUrlBuilder = ref('plainAuthRequestUrlBuilder')
 	}
+	
+	staticIssuerService(StaticSingleIssuerService) {
+		issuer = 'https://mitreid.org/'
+	}
+	dynamicServerConfigurationService(DynamicServerConfigurationService)
+	dynamicClientConfigurationService(DynamicRegistrationClientConfigurationService) {
+		template = ref('clientRegistrationTemplate')
+	}
+	clientRegistrationTemplate(RegisteredClient) {
+		clientName = 'Grails Integration Test'
+		scope = ['openid', 'email', 'address', 'profile', 'phone']
+		tokenEndpointAuthMethod = AuthMethod.SECRET_BASIC
+		redirectUris = ['http://localhost:8080/openid_connect_login']
+	}
+	staticAuthRequestOptionsService(StaticAuthRequestOptionsService)
+	plainAuthRequestUrlBuilder(PlainAuthRequestUrlBuilder)
+	
 	openIdConnectAuthenticationProvider(OIDCAuthenticationProvider) {
-		authoritiesMapper = namedAuthoritiesMapper(NamedAdminAuthoritiesMapper) {
-			admins = [
-				admin(SubjectIssuerGrantedAuthority, '90342.ASDFJWFA', 'https://mitreid.org/')
-			]
-		}
+		authoritiesMapper = ref('namedAuthoritiesMapper') 
 	}
+	
+	namedAuthoritiesMapper(NamedAdminAuthoritiesMapper) {
+		admins = [
+			ref('admin')
+		]
+	}
+	
+	admin(SubjectIssuerGrantedAuthority, '90342.ASDFJWFA', 'https://mitreid.org/')
 }
