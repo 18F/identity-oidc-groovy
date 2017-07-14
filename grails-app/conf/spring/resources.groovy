@@ -1,3 +1,6 @@
+import org.mitre.jose.keystore.JWKSetKeyStore
+import org.mitre.jwt.signer.service.impl.DefaultJWTSigningAndValidationService
+import org.mitre.jwt.signer.service.impl.JWKSetCacheService
 import org.mitre.oauth2.model.RegisteredClient
 import org.mitre.oauth2.model.ClientDetailsEntity.AuthMethod
 import org.mitre.openid.connect.client.NamedAdminAuthoritiesMapper
@@ -10,6 +13,7 @@ import org.mitre.openid.connect.client.service.impl.DynamicServerConfigurationSe
 import org.mitre.openid.connect.client.service.impl.JsonFileRegisteredClientService
 import org.mitre.openid.connect.client.service.impl.PlainAuthRequestUrlBuilder
 import org.mitre.openid.connect.client.service.impl.StaticAuthRequestOptionsService
+import org.mitre.openid.connect.client.service.impl.StaticClientConfigurationService
 import org.mitre.openid.connect.client.service.impl.StaticSingleIssuerService
 
 import helloauth.auth.UserPasswordEncoderListener
@@ -21,22 +25,25 @@ beans = {
 		authenticationManager = ref('authenticationManager')
 		issuerService = ref('staticIssuerService')
 		serverConfigurationService = ref('dynamicServerConfigurationService')
-		clientConfigurationService = ref('dynamicClientConfigurationService')
+		clientConfigurationService = ref('staticClientConfigurationService')
 		authRequestOptionsService = ref('staticAuthRequestOptionsService')
 		authRequestUrlBuilder = ref('plainAuthRequestUrlBuilder')
 	}
 	
 	staticIssuerService(StaticSingleIssuerService) {
-		issuer = 'https://mitreid.org/'
+		issuer = 'https://idp.int.login.gov/'
 	}
 	dynamicServerConfigurationService(DynamicServerConfigurationService)
-	dynamicClientConfigurationService(DynamicRegistrationClientConfigurationService) {
-		template = ref('clientRegistrationTemplate')
+	staticClientConfigurationService(StaticClientConfigurationService) {
+		clients = [
+			'https://idp.int.login.gov/': ref('clientRegistrationTemplate')
+		]
 	}
 	clientRegistrationTemplate(RegisteredClient) {
+		clientId = "you-shouldn't-let-people-pick-their-client-id-you-know"
 		clientName = 'Grails Integration Test'
 		scope = ['openid', 'email', 'address', 'profile', 'phone']
-		tokenEndpointAuthMethod = AuthMethod.SECRET_BASIC
+		tokenEndpointAuthMethod = AuthMethod.PRIVATE_KEY
 		redirectUris = ['http://localhost:8080/openid_connect_login']
 	}
 	staticAuthRequestOptionsService(StaticAuthRequestOptionsService)
@@ -53,4 +60,15 @@ beans = {
 	}
 	
 	admin(SubjectIssuerGrantedAuthority, '90342.ASDFJWFA', 'https://mitreid.org/')
+	
+	validatorCache(JWKSetCacheService)
+	
+	defaultSignerService(DefaultJWTSigningAndValidationService, ref('keyStore')) {
+		defaultSignerKeyId = 'rsa1'
+		defaultSigningAlgorithmName = 'RS256'
+	}
+	
+	keyStore(JWKSetKeyStore) {
+		location = 'classpath:keystore.jwks'
+	}
 }
